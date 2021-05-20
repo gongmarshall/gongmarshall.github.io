@@ -259,7 +259,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://marshallgong.top/2021/05/19/vlan_structure/">
+    <link itemprop="mainEntityOfPage" href="https://marshallgong.top/2021/05/19/vlan-structure/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="">
@@ -278,7 +278,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2021/05/19/vlan_structure/" itemprop="url">路由器中的VLAN</a></h1>
+                <a class="post-title-link" href="/2021/05/19/vlan-structure/" itemprop="url">路由器中的VLAN</a></h1>
         
 
         <div class="post-meta">
@@ -331,8 +331,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2021/05/19/vlan_structure/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2021/05/19/vlan_structure/" itemprop="commentCount"></span>
+                <a href="/2021/05/19/vlan-structure/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2021/05/19/vlan-structure/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -363,7 +363,7 @@
         
           
             <h1 id="1-路由器中的连接结构"><a href="#1-路由器中的连接结构" class="headerlink" title="1 路由器中的连接结构"></a>1 路由器中的连接结构</h1><p>对于像XR500中的只有一个switch, CPU与switch的连接示意图如下所示：</p>
-<p><img src="switch_to_cpu_structure_xr500.png" alt="switch2cpu"></p>
+<p><img src="/2021/05/19/vlan-structure/switch_to_cpu_structure_xr500.png" alt="switch2cpu"></p>
 <p>在console中输入“swconfig dev switch0 dev show”, 可以看到</p>
 <blockquote>
 <p>VLAN 1:<br>     vid: 1<br>     ports: 1 2 3 4 6<br>VLAN 2:<br>     vid: 2<br>     ports: 0 5</p>
@@ -381,7 +381,7 @@
 <p>第3,4行相当于一个改名操作，直接把eth1改名为ethlan,把eth0改名为ethwan。可以发现在这两条指令运行后找不到eth0和eth1了，因为它们已经被ethwan和ethlan替代了。</p>
 <p>也就是说当没有vlan的时候ethwan就相当于eth0,  ethlan就相当于eth1。后续的net-wan和net-lan对只是对ethwan, ethlan或br0, brwan进行操作。</p>
 <h1 id="3-VLAN"><a href="#3-VLAN" class="headerlink" title="3 VLAN"></a>3 VLAN</h1><p>将XR500的VLAN设置成下所示：</p>
-<p><img src="vlan_gui_setting" alt="image-20210520140648459"></p>
+<p><img src="/2021/05/19/vlan-structure/vlan_gui_setting" alt="image-20210520140648459"></p>
 <table>
 <thead>
 <tr>
