@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="1 路由器中的连接结构对于像XR500中的只有一个switch, CPU与switch的连接示意图如下所示：  在console中输入“swconfig dev switch0 dev show”, 可以看到  VLAN 1:     vid: 1     ports: 1 2 3 4 6VLAN 2:     vid: 2     ports: 0 5  拿到一个路由器，可以看到它有5个端口，这">
+<meta name="description" content="VLAN STRUCTURE Yuanshuai.Gong   [TOC] 路由器中的连接结构对于像XR500中的只有一个switch, CPU与switch的连接示意图如下所示：  在console中输入“swconfig dev switch0 dev show”, 可以看到  VLAN 1:     vid: 1     ports: 1 2 3 4 6VLAN">
 <meta property="og:type" content="article">
 <meta property="og:title" content="路由器中的VLAN">
 <meta property="og:url" content="https://marshallgong.top/2021/05/19/vlan-structure/index.html">
 <meta property="og:site_name" content="Marshall&#39;s Blog">
-<meta property="og:description" content="1 路由器中的连接结构对于像XR500中的只有一个switch, CPU与switch的连接示意图如下所示：  在console中输入“swconfig dev switch0 dev show”, 可以看到  VLAN 1:     vid: 1     ports: 1 2 3 4 6VLAN 2:     vid: 2     ports: 0 5  拿到一个路由器，可以看到它有5个端口，这">
+<meta property="og:description" content="VLAN STRUCTURE Yuanshuai.Gong   [TOC] 路由器中的连接结构对于像XR500中的只有一个switch, CPU与switch的连接示意图如下所示：  在console中输入“swconfig dev switch0 dev show”, 可以看到  VLAN 1:     vid: 1     ports: 1 2 3 4 6VLAN">
 <meta property="og:locale">
 <meta property="og:image" content="https://marshallgong.top/2021/05/19/vlan-structure/switch_to_cpu_structure_xr500.png">
 <meta property="og:image" content="https://marshallgong.top/2021/05/19/vlan-structure/vlan_gui_setting">
 <meta property="article:published_time" content="2021-05-19T07:22:31.000Z">
-<meta property="article:modified_time" content="2021-05-20T07:54:27.776Z">
+<meta property="article:modified_time" content="2021-05-31T00:55:31.264Z">
 <meta property="article:author" content="Marshall Gong">
 <meta property="article:tag" content="博客">
 <meta name="twitter:card" content="summary">
@@ -365,7 +365,26 @@
       
 
       
-        <h1 id="1-路由器中的连接结构"><a href="#1-路由器中的连接结构" class="headerlink" title="1 路由器中的连接结构"></a>1 路由器中的连接结构</h1><p>对于像XR500中的只有一个switch, CPU与switch的连接示意图如下所示：</p>
+        <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div align="center"><font size="70">VLAN STRUCTURE</font></div>
+<div align="center"><font size="5">Yuanshuai.Gong</font></div>
+<div style="page-break-after:always;"></div>
+
+<p>[TOC]</p>
+<h1 id="路由器中的连接结构"><a href="#路由器中的连接结构" class="headerlink" title="路由器中的连接结构"></a>路由器中的连接结构</h1><p>对于像XR500中的只有一个switch, CPU与switch的连接示意图如下所示：</p>
 <p><img src="/2021/05/19/vlan-structure/switch_to_cpu_structure_xr500.png" alt="switch2cpu"></p>
 <p>在console中输入“swconfig dev switch0 dev show”, 可以看到</p>
 <blockquote>
@@ -378,12 +397,12 @@
 <p>VLAN 1:<br>     vid: 1<br>     ports: 1 2 3 4 6<br>VLAN 2:<br>     vid: 2<br>     ports: 0 1 5</p>
 </blockquote>
 <p>上面将端口1（实际上是路由器上标识的端口4）同时设置带VLAN 1和VLAN 2。测试会发现端口1只能拿到VLAN 2中dhcp分配的IP 地址，即使WAN没有任何dhcp server, 端口1也不会从LAN端获取IP地址。因为swconfig是一个个VLAN进行配置的，也就是之前有把1划分到VLAN 1，但接着又把2划分到VLAN 2。</p>
-<h1 id="2-WAN和LAN的划分"><a href="#2-WAN和LAN的划分" class="headerlink" title="2 WAN和LAN的划分"></a>2 WAN和LAN的划分</h1><p>在第1章说的是switch中WAN和LAN的划分，但其实Linux系统还不知道。默认情况下进行的是如下的设置</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ifconfig eth1 hw ether lanmac</span><br><span class="line">ifconfig eth0 hw ether wanmac</span><br><span class="line">ip link <span class="built_in">set</span> dev eth1 name ethlan</span><br><span class="line">ip link <span class="built_in">set</span> dev eth0 name ethwan</span><br><span class="line">brctl addif br0 ethlan</span><br><span class="line">ifconfig br0 hw ether lanmac</span><br><span class="line">brctrl addif brwan ethwan</span><br><span class="line">sw_configvlan <span class="string">&quot;normal&quot;</span></span><br></pre></td></tr></table></figure>
+<h1 id="WAN和LAN的划分"><a href="#WAN和LAN的划分" class="headerlink" title="WAN和LAN的划分"></a>WAN和LAN的划分</h1><p>在第1章说的是switch中WAN和LAN的划分，但其实Linux系统还不知道。默认情况下进行的是如下的设置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ifconfig eth1 hw ether lanmac</span><br><span class="line">ifconfig eth0 hw ether wanmac</span><br><span class="line">ip link set dev eth1 name ethlan</span><br><span class="line">ip link set dev eth0 name ethwan</span><br><span class="line">brctl addif br0 ethlan</span><br><span class="line">ifconfig br0 hw ether lanmac</span><br><span class="line">brctrl addif brwan ethwan</span><br><span class="line">sw_configvlan &quot;normal&quot;</span><br></pre></td></tr></table></figure>
 
 <p>第3,4行相当于一个改名操作，直接把eth1改名为ethlan,把eth0改名为ethwan。可以发现在这两条指令运行后找不到eth0和eth1了，因为它们已经被ethwan和ethlan替代了。</p>
 <p>也就是说当没有vlan的时候ethwan就相当于eth0,  ethlan就相当于eth1。后续的net-wan和net-lan对只是对ethwan, ethlan或br0, brwan进行操作。</p>
-<h1 id="3-VLAN"><a href="#3-VLAN" class="headerlink" title="3 VLAN"></a>3 VLAN</h1><p>将XR500的VLAN设置成下所示：</p>
+<h1 id="VLAN"><a href="#VLAN" class="headerlink" title="VLAN"></a>VLAN</h1><p>将XR500的VLAN设置成下所示：</p>
 <p><img src="/2021/05/19/vlan-structure/vlan_gui_setting" alt="image-20210520140648459"></p>
 <table>
 <thead>
@@ -430,7 +449,7 @@
 <p>LAN端的设置，和默认一样。</p>
 </li>
 </ol>
-<h1 id="4-改变WAN口"><a href="#4-改变WAN口" class="headerlink" title="4 改变WAN口"></a>4 改变WAN口</h1><p>路由器为了方便用户操作将WAN口设置为固定的，其实对于WAN口和LAN口在同一个switch中，WAN口是可以改变。甚至可以有多个WAN口，当然这样可能会带来其它的问题（可能会有多个dhcp server）。</p>
+<h1 id="改变WAN口"><a href="#改变WAN口" class="headerlink" title="改变WAN口"></a>改变WAN口</h1><p>路由器为了方便用户操作将WAN口设置为固定的，其实对于WAN口和LAN口在同一个switch中，WAN口是可以改变。甚至可以有多个WAN口，当然这样可能会带来其它的问题（可能会有多个dhcp server）。</p>
 <p>先看默认情况下的switch：</p>
 <blockquote>
 <p>VLAN 1:<br>     vid: 1<br>     ports: 1 2 3 4 6<br>VLAN 2:<br>     vid: 2<br>     ports: 0 5</p>
@@ -448,7 +467,7 @@
 <p>config switch_vlan<br>        option device ‘switch0’<br>        option vlan ‘2’<br>        option vid ‘2’<br>        option ports ‘0 2’</p>
 </blockquote>
 <p>然后运行swconfig dev switch0 load /tmp/sw.conf就可以了。</p>
-<h1 id="5-总结"><a href="#5-总结" class="headerlink" title="5 总结"></a>5 总结</h1><p>虽然VLAN的脚本好像有很多，但其实知道怎么配置switch和brctl就可以了。因为脚本中最终也是来配置/tmp/sw.conf和bridge。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>虽然VLAN的脚本好像有很多，但其实知道怎么配置switch和brctl就可以了。因为脚本中最终也是来配置/tmp/sw.conf和bridge。</p>
 
       
     </div>
@@ -493,6 +512,26 @@
       
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/1970/01/01/vlan-structure/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/05/21/password-test_cp/" rel="prev" title="password_test">
+                password_test <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
@@ -595,7 +634,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -617,7 +656,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -650,7 +689,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E8%B7%AF%E7%94%B1%E5%99%A8%E4%B8%AD%E7%9A%84%E8%BF%9E%E6%8E%A5%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">1 路由器中的连接结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-WAN%E5%92%8CLAN%E7%9A%84%E5%88%92%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">2 WAN和LAN的划分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-VLAN"><span class="nav-number">3.</span> <span class="nav-text">3 VLAN</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E6%94%B9%E5%8F%98WAN%E5%8F%A3"><span class="nav-number">4.</span> <span class="nav-text">4 改变WAN口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5 总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E5%99%A8%E4%B8%AD%E7%9A%84%E8%BF%9E%E6%8E%A5%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">路由器中的连接结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WAN%E5%92%8CLAN%E7%9A%84%E5%88%92%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">WAN和LAN的划分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VLAN"><span class="nav-number">3.</span> <span class="nav-text">VLAN</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%94%B9%E5%8F%98WAN%E5%8F%A3"><span class="nav-number">4.</span> <span class="nav-text">改变WAN口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
