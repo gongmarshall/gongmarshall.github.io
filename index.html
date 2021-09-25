@@ -339,14 +339,331 @@
 
       
         
-          密码：123456
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2021/09/25/rt-dev1/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
+          
+            <h1 id="SMS"><a href="#SMS" class="headerlink" title="SMS"></a>SMS</h1><h2 id="Unicode"><a href="#Unicode" class="headerlink" title="Unicode"></a>Unicode</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://home.unicode.org/">Unicode 官网</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.unicode.org/charts/">Unicode charts</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.chi2ko.com/tool/CJK.htm">汉字对应Unicode</a></li>
+</ul>
+<h3 id="UTF-8"><a href="#UTF-8" class="headerlink" title="UTF-8"></a>UTF-8</h3><ol>
+<li>对单字节，高位设为<code>0</code>, 后面7 bit为该符号的Unicode</li>
+<li>对<code>n(n&gt;1)</code>字节的字符，第一个字节的前<code>n</code>位设为<code>1</code>，<code>n+1</code>位为<code>0</code>，后面字节的前两位均为<code>10</code>，余下部分为该字符的Unicode</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Unicode符号范围(hex) | UTF-8编码方式(binary)</span><br><span class="line">--------------------+---------------------------------------------</span><br><span class="line">0000 0000-0000 007F | 0xxxxxxx</span><br><span class="line">0000 0080-0000 07FF | 110xxxxx 10xxxxxx</span><br><span class="line">0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx</span><br><span class="line">0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</span><br></pre></td></tr></table></figure>
+
+<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><table>
+<thead>
+<tr>
+<th align="left">字符</th>
+<th align="left">Unicode</th>
+<th align="left">UTF-8</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>A</code></td>
+<td align="left"><code>U+0041</code></td>
+<td align="left"><code>41</code></td>
+</tr>
+<tr>
+<td align="left"><code>0</code></td>
+<td align="left"><code>U+0030</code></td>
+<td align="left"><code>30</code></td>
+</tr>
+<tr>
+<td align="left">你</td>
+<td align="left"><code>U+4f60</code></td>
+<td align="left"><code>E4BDA0</code></td>
+</tr>
+<tr>
+<td align="left">饕</td>
+<td align="left"><code>U+9955</code></td>
+<td align="left"><code>E9A595</code></td>
+</tr>
+</tbody></table>
+<h2 id="PDU-mode"><a href="#PDU-mode" class="headerlink" title="PDU mode"></a>PDU mode</h2><p>短信收发分<code>text</code>, <code>PDU</code>两种模式， 本文仅考虑<code>PDU</code>模式。 参考收发短信的PDU格式<a href="#fn:1">1</a>，总结主要内容如下。</p>
+<h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><table>
+<thead>
+<tr>
+<th align="left">元素</th>
+<th align="left">名称</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>GSM</code></td>
+<td align="left">Global System for Mobile Communications</td>
+<td align="left">全球移动通信系统</td>
+</tr>
+<tr>
+<td align="left"><code>SMS</code></td>
+<td align="left">Short Message Service</td>
+<td align="left">短信服务</td>
+</tr>
+<tr>
+<td align="left"><code>SMSC</code></td>
+<td align="left">Short Message Service Center</td>
+<td align="left">短信服务中心</td>
+</tr>
+<tr>
+<td align="left"><code>PDU</code></td>
+<td align="left">Protocol Data Unit</td>
+<td align="left">协议数据单元</td>
+</tr>
+<tr>
+<td align="left"><code>RP</code></td>
+<td align="left">Reply Path</td>
+<td align="left">应答路径</td>
+</tr>
+<tr>
+<td align="left"><code>UDHI</code></td>
+<td align="left">User Data Header Indicator</td>
+<td align="left">用户数据头标识</td>
+</tr>
+<tr>
+<td align="left"><code>SRR</code></td>
+<td align="left">Status Report Request</td>
+<td align="left">状态报告请求</td>
+</tr>
+<tr>
+<td align="left"><code>SRI</code></td>
+<td align="left">Status Report Indication</td>
+<td align="left">状态报告指示</td>
+</tr>
+<tr>
+<td align="left"><code>RD</code></td>
+<td align="left">Reject Duplicate</td>
+<td align="left">拒绝副本</td>
+</tr>
+<tr>
+<td align="left"><code>MTI</code></td>
+<td align="left">Message Type Indicator</td>
+<td align="left">信息类型指示</td>
+</tr>
+<tr>
+<td align="left"><code>MR</code></td>
+<td align="left">Message Reference</td>
+<td align="left">所有成功的SMS-SUBMIT参考数目</td>
+</tr>
+<tr>
+<td align="left"><code>TON</code></td>
+<td align="left">Type of number</td>
+<td align="left">号码类型</td>
+</tr>
+<tr>
+<td align="left"><code>SCA</code></td>
+<td align="left">Service Center Address</td>
+<td align="left">服务中心地址</td>
+</tr>
+<tr>
+<td align="left"><code>OA</code></td>
+<td align="left">Original Address</td>
+<td align="left">发送方地址（手机号码）</td>
+</tr>
+<tr>
+<td align="left"><code>DA</code></td>
+<td align="left">Destination Address</td>
+<td align="left">接收方地址（手机号码）</td>
+</tr>
+<tr>
+<td align="left"><code>PID</code></td>
+<td align="left">Protocol Identify</td>
+<td align="left">协议类型</td>
+</tr>
+<tr>
+<td align="left"><code>DCS</code></td>
+<td align="left">Data coding scheme</td>
+<td align="left">数据编码策略</td>
+</tr>
+<tr>
+<td align="left"><code>VP</code></td>
+<td align="left">Validity Period</td>
+<td align="left">消息在SMSC的有效期</td>
+</tr>
+<tr>
+<td align="left"><code>VPF</code></td>
+<td align="left">Validity Period Format</td>
+<td align="left">有效期格式</td>
+</tr>
+<tr>
+<td align="left"><code>SCTS</code></td>
+<td align="left">Service Center Timestamp</td>
+<td align="left">时间戳</td>
+</tr>
+<tr>
+<td align="left"><code>UD</code></td>
+<td align="left">User Data</td>
+<td align="left">用户数据</td>
+</tr>
+<tr>
+<td align="left"><code>UDL</code></td>
+<td align="left">User Data Length</td>
+<td align="left">用户数据长度</td>
+</tr>
+</tbody></table>
+<h3 id="短信收发格式"><a href="#短信收发格式" class="headerlink" title="短信收发格式"></a>短信收发格式</h3><p>发送短信</p>
+<p><img src="/2021/09/25/rt-dev1/Users/Administrator/OneDrive/prj/_posts/rt-dev/pdu_send.png" alt="发送短信的PDU格式"></p>
+<p>接收短信</p>
+<p><img src="/2021/09/25/rt-dev1/Users/Administrator/OneDrive/prj/_posts/rt-dev/pdu_receive.png" alt="接收短信的PDU格式"></p>
+<h4 id="SCA"><a href="#SCA" class="headerlink" title="SCA"></a>SCA</h4><table>
+<thead>
+<tr>
+<th align="left">SCA长度</th>
+<th align="left">SCA类型</th>
+<th align="left">SCA地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1 Octet</td>
+<td align="left">0-1 Octet</td>
+<td align="left">0-10 Octet</td>
+</tr>
+<tr>
+<td align="left">08</td>
+<td align="left">91</td>
+<td align="left">683108200115F1</td>
+</tr>
+</tbody></table>
+<ul>
+<li>SCA 长度：SCA类型与SCA地址的总长度</li>
+<li>SCA 类型：TON/NPI, <code>0x91</code>最常用</li>
+<li>SCA 地址：依照ISDN编号方式(<code>+8613800210511</code>, <code>13800210511</code>, <code>123456</code>)</li>
+</ul>
+<p>TON(type of number)</p>
+<ol>
+<li>International: <code>91</code></li>
+<li>National: <code>A1</code></li>
+<li>Unkown: <code>81</code></li>
+</ol>
+<h4 id="PDU-Type"><a href="#PDU-Type" class="headerlink" title="PDU Type"></a>PDU Type</h4><p>第一个8位位组，发送和接收的格式略有不同。</p>
+<ul>
+<li>发送格式：SMS-SUBMIT</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">7</th>
+<th align="left">6</th>
+<th align="left">5</th>
+<th align="left">4 3</th>
+<th align="left">2</th>
+<th align="left">1 0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RP</td>
+<td align="left">UDHI</td>
+<td align="left">SRR</td>
+<td align="left">VPF</td>
+<td align="left">RD</td>
+<td align="left">MTI</td>
+</tr>
+<tr>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">1</td>
+<td align="left">10</td>
+<td align="left">0</td>
+<td align="left">01</td>
+</tr>
+</tbody></table>
+<ul>
+<li>接收格式：SMS-DELIVER</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">7</th>
+<th align="left">6</th>
+<th align="left">5</th>
+<th align="left">4 3</th>
+<th align="left">2</th>
+<th align="left">1 0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RP</td>
+<td align="left">UDHI</td>
+<td align="left">SRI</td>
+<td align="left"></td>
+<td align="left">MMS</td>
+<td align="left">MTI</td>
+</tr>
+<tr>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">00</td>
+<td align="left">1</td>
+<td align="left">00</td>
+</tr>
+</tbody></table>
+<p>这里比较关键的参数是<code>UDHI</code>，用户数据头部标识，为1代表该短信是长短信，被分为多条短信发送，用户数据部分包含头部信息。</p>
+<h4 id="DCS"><a href="#DCS" class="headerlink" title="DCS"></a>DCS</h4><p>DCS(Data coding scheme)</p>
+<ol>
+<li>7-bit: <code>00</code></li>
+<li>8-bit: <code>F4</code></li>
+<li>UCS2: <code>08</code></li>
+</ol>
+<h2 id="接收短信"><a href="#接收短信" class="headerlink" title="接收短信"></a>接收短信</h2><p>使用手机向带有SIM卡的<code>LBR1020</code>发送一条长短信：</p>
+<p>生僻字</p>
+<p>（滟灪爩鱻麤龖龗齾齉靐龘）拼音如下： 【汉语拼音】滟(yàn) 灪(yù) 爩(yù) 鱻(xiǎn) 麤(cū) 龖(dá) 龗(línɡ) 齾(yà) 齉(nànɡ) 靐(bìnɡ) 龘(dá)</p>
+<p>通过<code>mbctrl.sh --show-message</code>获取SIM卡的短信列表</p>
+<table>
+<thead>
+<tr>
+<th><code> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24</code></th>
+<th><code>root@LBR1020:/# mbctrl.sh --show-message ---#Sent Command:AT+CMGL=4--- #Got response: AT+CMGL=4 +CMGL: 0,1,,157 0891683108200115F36008A0018016000008026011319352238C05000384030130105F15988600355343514630118D2D7269629862634F1860E0591AFF0C00500052004F4F1A54580033002E003951436BCF670853EF4EAB5929732B30014EAC4E1C8D2D726952384F1860E04EF7FF0C8FD86709003551438BDD8D395238300100330030004700425A314E506D4191CF003151438D2D3001997F4E864E487EA2530530016EF4 +CMGL: 1,1,,73 0891683108200115F36008A00180160000080260113193622338050003840303590D201C548C4F60201D767B5F554E0A6D7779FB52A8548C4F6000410050005083B753D666F4591A4F1860E04FE1606FFF01 +CMGL: 2,1,,157 0891683108200115F36408A0018016000008026011319362238C0500038403026EF462538F667EA253057B498D85003100304E2A54C17C7B4F1860E0FF0C53055E7453E653EF514D8D39988653D60032003053EA533B752853E37F69FF018BE660C570B951FB002000680074007400700073003A002F002F00640078002E00310030003000380036002E0063006E002F0072006300570045004300670020621677ED4FE156DE +CMGL: 3,1,,157 0891683108200115F36008A0018016000008026021413310238C0500034E0301301000350047770B79FB52A8301189C698914F1A5458662565E55927793C53056B6357286D3E9001FF0C72315947827A30014F189177300154D454E954D454E94F1A54584E0990094E00002B00310035004700424E135C5E6D4191CF72794EAB4EF700310035002E00395143002F670830028BE660C570B951FB002000680074007400700073 +CMGL: 4,1,,157 0891683108200115F36008A0018016000008026021413310238C0500034E0302003A002F002F00640078002E00310030003000380036002E0063006E002F004F00380039005F004100670020621677ED4FE156DE590D201C548C4F60201D767B5F554E0A6D7779FB52A8548C4F6000410050005083B753D666F4591A4F1860E04FE1606FFF01FF086CE8FF1A524D671F5DF253C24E0E4F1860E072794EAB4EF76D3B52A87684 +CMGL: 5,1,,53 0891683108200115F36408A001801600000802602141331023240500034E030375286237FF0C65E06CD591CD590D53C24E0E672C4F1860E06D3B52A8FF09 +CMGL: 6,0,,159 0891683108200115F1640BA17105611983F40008026021514111238C0500035A0201FF086EDF706A72299C7B9EA49F969F979F7E9F4997509F98FF0962FC97F359824E0BFF1A000A30106C498BED62FC97F330116EDF0028007900E0006E00290020706A0028007900F90029002072290028007900F9002900209C7B00280078006901CE006E002900209EA400280063016B002900209F960028006400E1002900209F970028006C +CMGL: 7,0,,89 0891683108200115F1640BA17105611983F4000802602151415123460500035A020200ED006E0261002900209F7E0028007900E0002900209F490028006E00E0006E02610029002097500028006200EC006E0261002900209F980028006400E10029 OK #Return Val:0 </code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="soap-测试"><a href="#soap-测试" class="headerlink" title="soap 测试"></a>soap 测试</h3><p>使用 SOAP Sender 发送<code>WAN3GinterfaceConfig:1#GetSMSInfo</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">SOAP-ENV:Envelope</span></span></span><br><span class="line"><span class="tag">   <span class="attr">xmlns:SOAP-ENV</span>=<span class="string">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span></span></span><br><span class="line"><span class="tag">   <span class="attr">SOAP-ENV:encodingStyle</span>=<span class="string">&quot;http://schemas.xmlsoap.org/soap/encoding/&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">SOAP-ENV:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">m:GetSMSInfoResponse</span> <span class="attr">xmlns:m</span>=<span class="string">&quot;urn:NETGEAR-ROUTER:service:WAN3GinterfaceConfig:1&quot;</span>&gt;</span> <span class="tag">&lt;<span class="name">NewSMS</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">UnreadMsgs</span>&gt;</span>0<span class="tag">&lt;/<span class="name">UnreadMsgs</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">MsgCounts</span>&gt;</span>8<span class="tag">&lt;/<span class="name">MsgCounts</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>0<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/11 13:39:25 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>30105F15988600355343514630118D2D7269629862634F1860E0591AFF0C00500052004F4F1A54580033002E003951436BCF670853EF4EAB5929732B30014EAC4E1C8D2D726952384F1860E04EF7FF0C8FD86709003551438BDD8D395238300100330030004700425A314E506D4191CF003151438D2D3001997F4E864E487EA2530530016EF4<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>10086100<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>2<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/11 13:39:26 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>6EF462538F667EA253057B498D85003100304E2A54C17C7B4F1860E0FF0C53055E7453E653EF514D8D39988653D60032003053EA533B752853E37F69FF018BE660C570B951FB002000680074007400700073003A002F002F00640078002E00310030003000380036002E0063006E002F0072006300570045004300670020621677ED4FE156DE<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>10086100<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>1<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/11 13:39:26 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>590D201C548C4F60201D767B5F554E0A6D7779FB52A8548C4F6000410050005083B753D666F4591A4F1860E04FE1606FFF01<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>10086100<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>3<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/12 14:33:01 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>301000350047770B79FB52A8301189C698914F1A5458662565E55927793C53056B6357286D3E9001FF0C72315947827A30014F189177300154D454E954D454E94F1A54584E0990094E00002B00310035004700424E135C5E6D4191CF72794EAB4EF700310035002E00395143002F670830028BE660C570B951FB002000680074007400700073<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>10086100<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>4<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/12 14:33:01 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>003A002F002F00640078002E00310030003000380036002E0063006E002F004F00380039005F004100670020621677ED4FE156DE590D201C548C4F60201D767B5F554E0A6D7779FB52A8548C4F6000410050005083B753D666F4591A4F1860E04FE1606FFF01FF086CE8FF1A524D671F5DF253C24E0E4F1860E072794EAB4EF76D3B52A87684<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>10086100<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>5<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/12 14:33:01 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>75286237FF0C65E06CD591CD590D53C24E0E672C4F1860E06D3B52A8FF09<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>10086100<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>6<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/12 15:14:11 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>FF086EDF706A72299C7B9EA49F969F979F7E9F4997509F98FF0962FC97F359824E0BFF1A000A30106C498BED62FC97F330116EDF0028007900E0006E00290020706A0028007900F90029002072290028007900F9002900209C7B00280078006901CE006E002900209EA400280063016B002900209F960028006400E1002900209F970028006C<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>17501691384<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Msg</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Index</span>&gt;</span>7<span class="tag">&lt;/<span class="name">Index</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Time</span>&gt;</span>2020/06/12 15:14:15 +32<span class="tag">&lt;/<span class="name">Time</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Text</span>&gt;</span>00ED006E0261002900209F7E0028007900E0002900209F490028006E00E0006E02610029002097500028006200EC006E0261002900209F980028006400E10029<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Type</span>&gt;</span>SMS<span class="tag">&lt;/<span class="name">Type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Sender</span>&gt;</span>17501691384<span class="tag">&lt;/<span class="name">Sender</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Read</span>&gt;</span>true<span class="tag">&lt;/<span class="name">Read</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Msg</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">NewSMS</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">m:GetSMSInfoResponse</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ResponseCode</span>&gt;</span>0<span class="tag">&lt;/<span class="name">ResponseCode</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">SOAP-ENV:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">SOAP-ENV:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>收到的PDU信息以及解码后信息如下，长短信会被分批发送，类似IP分片。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">unicode:</span><br><span class="line">    part 1: FF086EDF706A72299C7B9EA49F969F979F7E9F4997509F98FF0962FC97F359824E0BFF1A000A30106C498BED62FC97F330116EDF0028007900E0006E00290020706A0028007900F90029002072290028007900F9002900209C7B00280078006901CE006E002900209EA400280063016B002900209F960028006400E1002900209F970028006C</span><br><span class="line">    part 2: 00ED006E0261002900209F7E0028007900E0002900209F490028006E00E0006E02610029002097500028006200EC006E0261002900209F980028006400E10029</span><br><span class="line"></span><br><span class="line">utf-16 decode:</span><br><span class="line">    part 1: （滟灪爩鱻麤龖龗齾齉靐龘）拼音如下： 【汉语拼音】滟(yàn) 灪(yù) 爩(yù) 鱻(xiǎn) 麤(cū) 龖(dá) 龗(l</span><br><span class="line">    part 2: ínɡ) 齾(yà) 齉(nànɡ) 靐(bìnɡ) 龘(dá)</span><br></pre></td></tr></table></figure>
+
+<h3 id="PDU-解析"><a href="#PDU-解析" class="headerlink" title="PDU 解析"></a>PDU 解析</h3><p>针对测试用例，参考短信实用手册<a href="#fn:2">2</a>，下面进行详细解释：</p>
+<p>Analysis received PDU</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">0891683108200115F1640BA17105611983F40008026021514111238C0500035A0201FF086EDF706A72299C7B9EA49F969F979F7E9F4997509F98FF0962FC97F359824E0BFF1A000A30106C498BED62FC97F330116EDF0028007900E0006E00290020706A0028007900F90029002072290028007900F9002900209C7B00280078006901CE006E002900209EA400280063016B002900209F960028006400E1002900209F970028006C  </span><br><span class="line">---</span><br><span class="line">SCA: 08 91 683108200115F1 服务中心地址（server center address 长度 类型 地址）</span><br><span class="line">PDU Header: 64</span><br><span class="line">TP-OA: 0B A1 7105611983F4</span><br><span class="line">TP-PID: 00</span><br><span class="line">TP-DCS: 08</span><br><span class="line">TP-SCTS: 02602151411123</span><br><span class="line">TP-UDL: 8C</span><br><span class="line">Data header: 0500035A 0201</span><br><span class="line">TP-UD: FF086EDF706A72299C7B9EA49F969F979F7E9F4997509F98FF0962FC97F359824E0BFF1A000A30106C498BED62FC97F330116EDF0028007900E0006E00290020706A0028007900F90029002072290028007900F9002900209C7B00280078006901CE006E002900209EA400280063016B002900209F960028006400E1002900209F970028006C</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+
+<p><strong>SCA</strong><br><code>08 91 68 31 08 20 01 15 F1</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">08: SMSC地址信息的长度，8个字节(含格式信息)</span><br><span class="line">91: SMSC地址格式 国际格式</span><br><span class="line">68 31 08 20 01 15 F1: 接收方SMSC地址 +8613800210511，补`F`凑成整数</span><br></pre></td></tr></table></figure>
+
+<p><strong>PDU Header</strong> 协议数据单元头部<br>- <code>64</code>: SMS-DELIVER消息的第一个字节</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">RP UDHI SRI _ _ MMS MTI</span><br><span class="line">0  1    1   0 0 1   00</span><br><span class="line">- RP: 0, 应答路径未设置  </span><br><span class="line">- UDHI: 1, 用户数据包含头信息  </span><br><span class="line">- SRI: 1, 状态报告将返回给短消息实体(SME)  </span><br><span class="line">- MSS: 1, 在SMSC中没有更多信息等待MS  </span><br><span class="line">- MTI: 00, 信息类型指示 SMS-DELIVER(SMS-&gt;MS)</span><br></pre></td></tr></table></figure>
+
+<p><strong>TP-OA</strong><br>- <code>0B A1 71 05 61 19 83 F4</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0B: 发送方地址长度, 11</span><br><span class="line">A1: 发送方地址格式，国内格式</span><br><span class="line">71 05 61 19 83 F4: 发送方地址, 17501691384, 补`F`凑成整数</span><br></pre></td></tr></table></figure>
+
+<p><strong>TP-PID</strong><br>- <code>00</code>: 协议标识, GSM类型，点到点方式<br><strong>TP-DCS</strong><br>- <code>08</code>: 用户信息编码方式, UCS2<br><strong>TP-SCTS</strong><br>- <code>02 60 21 51 41 11 23</code>: 时间戳，<code>2020-06-12 15:14:11 +32</code><br><strong>TP-UDL</strong><br>- <code>8C</code>: 用户数据长度, 当前字节往后（不含<code>8C</code>）的数据长度，如果有分片仅计算本批数据<br><strong>TP-UD</strong><br>- <code>05 00 03 5A 02 01</code>: 短信头部</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">05: 数据头部剩余5个字节</span><br><span class="line">00: 长短信，8位的参考标识</span><br><span class="line">03: 数据头部剩余3个字节</span><br><span class="line">5A: 这批短信的唯一参考标识</span><br><span class="line">02: 这批短信的数量，该长短信被分为2条</span><br><span class="line">01: 本条短信是长短信中的第1条</span><br></pre></td></tr></table></figure>
+
+<p>- <code>FF08...</code>: TP-UD, 余下都是短信信息</p>
+<h2 id="在线工具"><a href="#在线工具" class="headerlink" title="在线工具"></a>在线工具</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.qqxiuzi.cn/bianma/Unicode-UTF.php">Unicode和UTF编码转换</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.diafaan.com/sms-tutorials/gsm-modem-tutorial/online-sms-pdu-decoder/">PDU 解码 - Online SMS PDU Decoder</a></li>
+<li><a target="_blank" rel="noopener" href="http://smstools3.kekekasvi.com/topic.php?id=288">PDU 编码 - SMS Server Tools 3 community</a></li>
+</ul>
+<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011196227/article/details/38960283">GSM短信消息text Mode和PDU Mode的说明</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html">字符编码笔记：ASCII，Unicode 和 UTF-8 - 阮一峰</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.gsm-modem.de/sms-pdu-mode.html">SMS PDU mode</a></li>
+<li><a target="_blank" rel="noopener" href="http://smstools3.kekekasvi.com/index.php?p=fileformat">sms file format</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/GSM_03.40">GMS 03.40 - 维基百科</a></li>
+</ul>
+<hr>
+<ol>
+<li>[SMS and the PDU format](<a target="_blank" rel="noopener" href="http://www.turbocontrol.com/CoolStuff/SMS">http://www.turbocontrol.com/CoolStuff/SMS</a> messages and the PDU format.htm) <a href="#fnref:1">↩</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.sendsms.cn/blog/wp-content/uploads/2019/06/%E7%9F%AD%E4%BF%A1%E5%AE%9E%E7%94%A8%E6%89%8B%E5%86%8C.pdf">短信实用手册</a> [↩](</li>
+</ol>
+
+          
         
       
     </div>
@@ -854,7 +1171,7 @@
 <p>（原文：<a target="_blank" rel="noopener" href="http://blog.csdn.net/ergouge/article/details/8185219">http://blog.csdn.net/ergouge/article/details/8185219</a> ）</p>
 <h1 id="URI和URL的区别"><a href="#URI和URL的区别" class="headerlink" title="URI和URL的区别"></a>URI和URL的区别</h1><h5 id="URI，是uniform-resource-identifier，统一资源标识符，用来唯一的标识一个资源。"><a href="#URI，是uniform-resource-identifier，统一资源标识符，用来唯一的标识一个资源。" class="headerlink" title="URI，是uniform resource identifier，统一资源标识符，用来唯一的标识一个资源。"></a>URI，是uniform resource identifier，统一资源标识符，用来唯一的标识一个资源。</h5><p>Web上可用的每种资源如HTML文档、图像、视频片段、程序等都是一个来URI来定位的<br>URI一般由三部组成：<br>①访问资源的命名机制<br>②存放资源的主机名<br>③资源自身的名称，由路径表示，着重强调于资源。</p>
 <h5 id="URL是uniform-resource-locator，统一资源定位器，它是一种具体的URI，即URL可以用来标识一个资源，而且还指明了如何locate这个资源。"><a href="#URL是uniform-resource-locator，统一资源定位器，它是一种具体的URI，即URL可以用来标识一个资源，而且还指明了如何locate这个资源。" class="headerlink" title="URL是uniform resource locator，统一资源定位器，它是一种具体的URI，即URL可以用来标识一个资源，而且还指明了如何locate这个资源。"></a>URL是uniform resource locator，统一资源定位器，它是一种具体的URI，即URL可以用来标识一个资源，而且还指明了如何locate这个资源。</h5><p>URL是Internet上用来描述信息资源的字符串，主要用在各种WWW客户程序和服务器程序上，特别是著名的Mosaic。<br>采用URL可以用一种统一的格式来描述各种信息资源，包括文件、服务器的地址和目录等。URL一般由三部组成：<br>①协议(或称为服务方式)<br>②存有该资源的主机IP地址(有时也包括端口号)<br>③主机资源的具体地址。如目录和文件名等</p>
-<h5 id="URN，uniform-resource-name，统一资源命名，是通过名字来标识资源，比如mailto-x6a-97-x76-97-x2d-x6e-101-x74-x40-106-x61-x76-x61-46-x73-x75-x6e-46-99-111-x6d-。"><a href="#URN，uniform-resource-name，统一资源命名，是通过名字来标识资源，比如mailto-x6a-97-x76-97-x2d-x6e-101-x74-x40-106-x61-x76-x61-46-x73-x75-x6e-46-99-111-x6d-。" class="headerlink" title="URN，uniform resource name，统一资源命名，是通过名字来标识资源，比如mailto:&#x6a;&#97;&#x76;&#97;&#x2d;&#x6e;&#101;&#x74;&#x40;&#106;&#x61;&#x76;&#x61;&#46;&#x73;&#x75;&#x6e;&#46;&#99;&#111;&#x6d;。"></a>URN，uniform resource name，统一资源命名，是通过名字来标识资源，比如mailto:<a href="mailto:&#x6a;&#97;&#x76;&#97;&#x2d;&#x6e;&#101;&#x74;&#x40;&#106;&#x61;&#x76;&#x61;&#46;&#x73;&#x75;&#x6e;&#46;&#99;&#111;&#x6d;">&#x6a;&#97;&#x76;&#97;&#x2d;&#x6e;&#101;&#x74;&#x40;&#106;&#x61;&#x76;&#x61;&#46;&#x73;&#x75;&#x6e;&#46;&#99;&#111;&#x6d;</a>。</h5><p>URI是以一种抽象的，高层次概念定义统一资源标识，而URL和URN则是具体的资源标识的方式。URL和URN都是一种URI。笼统地说，每个 URL 都是 URI，但不一定每个 URI 都是 URL。这是因为 URI 还包括一个子类，即统一资源名称 (URN)，它命名资源但不指定如何定位资源。上面的 mailto、news 和 isbn URI 都是 URN 的示例。</p>
+<h5 id="URN，uniform-resource-name，统一资源命名，是通过名字来标识资源，比如mailto-x6a-x61-118-97-45-x6e-x65-116-x40-106-x61-x76-97-x2e-115-x75-110-46-x63-111-109-。"><a href="#URN，uniform-resource-name，统一资源命名，是通过名字来标识资源，比如mailto-x6a-x61-118-97-45-x6e-x65-116-x40-106-x61-x76-97-x2e-115-x75-110-46-x63-111-109-。" class="headerlink" title="URN，uniform resource name，统一资源命名，是通过名字来标识资源，比如mailto:&#x6a;&#x61;&#118;&#97;&#45;&#x6e;&#x65;&#116;&#x40;&#106;&#x61;&#x76;&#97;&#x2e;&#115;&#x75;&#110;&#46;&#x63;&#111;&#109;。"></a>URN，uniform resource name，统一资源命名，是通过名字来标识资源，比如mailto:<a href="mailto:&#x6a;&#x61;&#118;&#97;&#45;&#x6e;&#x65;&#116;&#x40;&#106;&#x61;&#x76;&#97;&#x2e;&#115;&#x75;&#110;&#46;&#x63;&#111;&#109;">&#x6a;&#x61;&#118;&#97;&#45;&#x6e;&#x65;&#116;&#x40;&#106;&#x61;&#x76;&#97;&#x2e;&#115;&#x75;&#110;&#46;&#x63;&#111;&#109;</a>。</h5><p>URI是以一种抽象的，高层次概念定义统一资源标识，而URL和URN则是具体的资源标识的方式。URL和URN都是一种URI。笼统地说，每个 URL 都是 URI，但不一定每个 URI 都是 URL。这是因为 URI 还包括一个子类，即统一资源名称 (URN)，它命名资源但不指定如何定位资源。上面的 mailto、news 和 isbn URI 都是 URN 的示例。</p>
 <p>在Java的URI中，一个URI实例可以代表绝对的，也可以是相对的，只要它符合URI的语法规则。而URL类则不仅符合语义，还包含了定位该资源的信息，因此它不能是相对的。<br>在Java类库中，URI类不包含任何访问资源的方法，它唯一的作用就是解析。<br>相反的是，URL类可以打开一个到达资源的流。</p>
 <h1 id="HTTP之请求消息Request"><a href="#HTTP之请求消息Request" class="headerlink" title="HTTP之请求消息Request"></a>HTTP之请求消息Request</h1><p>客户端发送一个HTTP请求到服务器的请求消息包括以下格式：</p>
 <h5 id="请求行（request-line）、请求头部（header）、空行和请求数据四个部分组成。"><a href="#请求行（request-line）、请求头部（header）、空行和请求数据四个部分组成。" class="headerlink" title="请求行（request line）、请求头部（header）、空行和请求数据四个部分组成。"></a>请求行（request line）、请求头部（header）、空行和请求数据四个部分组成。</h5><p><img src="https://upload-images.jianshu.io/upload_images/2964446-fdfb1a8fce8de946.png?imageMogr2/auto-orient/strip%7CimageView2/2" alt="img"></p>
@@ -2118,140 +2435,6 @@ BlkIPNum=2
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://marshallgong.top/2021/05/21/password-test_cp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Marshall's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2021/05/21/password-test_cp/" itemprop="url">password_test</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-21T15:01:43+08:00">
-                2021-05-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2021/05/21/password-test_cp/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2021/05/21/password-test_cp/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          密码：123456
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2021/05/21/password-test_cp/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://marshallgong.top/2021/05/21/password-test/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2336,6 +2519,140 @@ BlkIPNum=2
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2021/05/21/password-test/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://marshallgong.top/2021/05/21/password-test_cp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Marshall's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2021/05/21/password-test_cp/" itemprop="url">password_test</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-21T15:01:43+08:00">
+                2021-05-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2021/05/21/password-test_cp/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2021/05/21/password-test_cp/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          密码：123456
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2021/05/21/password-test_cp/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
