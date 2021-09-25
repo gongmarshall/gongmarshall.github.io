@@ -1,0 +1,54 @@
+digraph st2{
+    fontname = "Verdana";
+    fontsize = 10;
+    rankdir=TB;
+   
+     
+    node [fontname = "Verdana", fontsize = 10, color="skyblue", shape="record"];
+     
+    edge [fontname = "Verdana", fontsize = 10, color="crimson", style="solid"];
+     
+   
+  
+   subgraph cluster_udpMatch {
+	label="ipt_entry";
+	bgcolor="mintcream"
+	ipt_entry [label="{<head>ipt_entry|<ipt_ip>ip|nfcache|<target_offset>target_offset|<next_offset>next_offset|comefrom|<ipt_counters>counters|<elems0>(elems[0])}"];
+	subgraph cluster_match {
+	label="ipt_match";
+	ipt_match [lable="{<head>ipt_match}"];
+	user [label="{<head>user|match_size|(name=udp)|revision}"];
+	match_size;
+	"data[0]"; 
+	}
+	
+	ipt_udp [label="{<head>ipt_udp|(spts[0]=0x0,spts[1]=0xffff)|(dpts[0]=d[ts[1]=53)|invflags}"];
+
+	subgraph cluster_target {
+	label="ipt_target";
+	ipt_target [lable="{<head>ipt_target}"];
+	target_user [label="{<head>user|target_size|(name=REDIRECT)|revision}"];
+	target_size;
+	"target_data[0]" [lable="{<head>(data[0])}"]; 
+	}
+	ip_nat_multi_range [label="{<head>ip_nat_multi_range|(rangesize=1)|<ip_nat_range>(range[1])}"];
+	
+	
+   
+   }
+	ipt_ip [label="{<head>ipt_ip|<src>src|<dst>dst|<smask>smask|<dmsk>dmask|<iniface>iniface|<outiface>outiface|<iniface_mask>iniface_mask|<outiface_mask>outiface_mask|proto|flags|invflags}"];
+	nf_nat_range [label="{<head>nf_nat_range|flags|min_ip|max_ip|<min>min|<max>max|port_forwarding_external_starting_port}"];
+	ip_conntrack_manip_proto_min [label="{<head>ip_conntrack_manip_proto|all|port}"];
+	ip_conntrack_manip_proto_max [label="{<head>ip_conntrack_manip_proto|all|port}"];
+	ipt_entry:elems0 -> ipt_match:head;
+
+	ipt_entry: ipt_ip -> ipt_ip;
+	"data[0]" -> ipt_udp:head;
+	ipt_udp: inflags -> ipt_target:head;
+	"target_data[0]" -> ip_nat_multi_range:head;
+	ip_nat_multi_range : ip_nat_range -> nf_nat_range : head;
+
+	nf_nat_range:min -> ip_conntrack_manip_proto_min:head;
+	nf_nat_range:max -> ip_conntrack_manip_proto_max:head;
+	
+}

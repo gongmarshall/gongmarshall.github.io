@@ -1,0 +1,23 @@
+digraph st2{
+    fontname = "Verdana";
+    fontsize = 10;
+    rankdir=TB;
+    size="20,20"
+     
+    node [fontname = "Verdana", fontsize = 10, color="skyblue", shape="record"];
+     
+    edge [fontname = "Verdana", fontsize = 10, color="crimson", style="solid"];
+     
+   iptc_handle_t [label="{<head>xtc_handle|<sockfd>sockfd|<list_head>chains|<chain_iterator_cur>(*chain_iterator_cur)|<rule_head>(*rule_iterator_cur)|num_chains|<chain_index>chain_index|chain_index_sz|sorted_offsets|<getinfo>info|<getentries>(*entries)}", color="red"];
+   chain_head [label="{<head>chain_head|<list>list|name|hooknum|references|verdict|<counters>counters|<counter_map>counter_map|num_rules|<rules>rules|index|head_offset|foot_index|foot_offset<next>next}", color="yellow"];
+   rule_head [label="{<head>rule_head|<chain>(*chain)|<counter_map>counter_map|index|offset|<type>type|<jump>(*jump)|size|<entry>(entry[0])}"];
+   ipt_getinfo [label="{<head>ipt_getinfo|name|valid_hooks|(hook_entry[])|(under_flow[])|number_entries|size}"];
+   ipt_get_entries [label="{<head>ipt_get_entries|name|size|<ipt_entry>(entrytable[0])}"]
+    
+   iptc_handle_t:chain_iterator -> chain_head:head;
+   iptc_handle_t:rule_head -> rule_head:head;
+   iptc_handle_t:chain_index -> chain_head:head [style="dashed", color="forestgreen"];
+   iptc_handle_t:getinfo -> ipt_getinfo:head;
+   iptc_handle_t:getentries -> ipt_get_entries:head ;
+  
+   }

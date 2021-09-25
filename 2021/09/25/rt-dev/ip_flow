@@ -1,0 +1,78 @@
+digraph st2{
+    fontname = "Verdana";
+    fontsize = 10;
+    rankdir=TB;
+  
+     
+    node [fontname = "Verdana", fontsize = 10, color="skyblue", shape="record"];
+     
+    edge [fontname = "Verdana", fontsize = 10, color="crimson", style="solid"];
+     
+  
+ 
+
+   subgraph cluster_ip_input {
+	label="ip_input.c";
+	bgcolor="mintcream"
+	ip_local_deliver_finish [ shape="oval"];
+	NF_INET_LOCAL_INPUT [color = forestgreen, style=filled, fontsize=15];
+	ip_local_deliver [shape="oval"];
+	ip_rcv_finish [shape="oval"];
+	NF_INET_PRE_ROUTING [color = forestgreen, style=filled, fontsize=15];
+	ip_rcv [ shape="oval"];
+	
+   }
+/*ip_output*/
+ subgraph cluster_ip_output {
+	label="ip_output.c";
+	bgcolor="mintcream"
+	ip_queue_xmit [ shape="oval"];
+	ip_local_out [ shape="oval"];
+	NF_INET_LOCAL_OUTPUT [color = forestgreen, style=filled, fontsize=15];
+	ip_output [shape="oval"];
+	NF_INET_POST_ROUTING [color = forestgreen, style=filled, fontsize=15];
+	ip_finish_output [ shape="oval"];
+	ip_finish_output2 [ shape="oval"];
+	
+   }
+/*dev.c*/
+ subgraph cluster_dev {
+	label="dev.c";
+	bgcolor="mintcream";
+	netif_receive_skb [shape="oval"];
+	dev_queue_xmit [shape="oval"];
+  }
+/*arp*/
+ subgraph cluster_arp {
+	label="ARP";
+	bgcolor="mintcream";
+	dst_neigh_output [shape="oval"];
+  }
+
+ subgraph cluster_routing {
+
+  	label = "ROUTING";
+	bgcolor="mintcream"
+	ip_route_input [shape="oval"];
+	"Forwarding Information Base";
+	ip_route_output_flow [shape="oval"];
+  }
+subgraph cluster_ip_forward {
+	label = "ip_forward.c"
+	bgcolor="mintcream";
+	ip_forward [shape="oval"];
+	NF_INET_FORWARD [color= forestgreen, style=filled, fontsize=15];
+	ip_forward_finish [shape="oval"];
+ }
+
+
+	netif_receive_skb->ip_rcv->NF_INET_PRE_ROUTING -> ip_rcv_finish -> ip_local_deliver -> NF_INET_LOCAL_INPUT -> ip_local_deliver_finish;
+	ip_queue_xmit->ip_local_out->NF_INET_LOCAL_OUTPUT->ip_output->NF_INET_POST_ROUTING->ip_finish_output->ip_finish_output2->dev_queue_xmit;
+	ip_finish_output2->dst_neigh_output->dev_queue_xmit;
+	
+	ip_rcv_finish->ip_forward->NF_INET_FORWARD->ip_forward_finish->ip_output;
+	ip_rcv_finish->ip_route_input;
+	ip_queue_xmit->ip_route_output_flow;
+	"Forwarding Information Base"->ip_route_input;
+	"Forwarding Information Base"->ip_route_output_flow;
+}

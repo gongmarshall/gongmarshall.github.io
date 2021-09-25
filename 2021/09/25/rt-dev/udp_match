@@ -1,0 +1,31 @@
+digraph st2{
+    fontname = "Verdana";
+    fontsize = 10;
+    rankdir=TB;
+   
+     
+    node [fontname = "Verdana", fontsize = 10, color="skyblue", shape="record"];
+     
+    edge [fontname = "Verdana", fontsize = 10, color="crimson", style="solid"];
+     
+   
+  
+   subgraph cluster_udpMatch {
+	label="ipt_entry";
+	bgcolor="mintcream"
+	ipt_entry [label="{<head>ipt_entry|<ipt_ip>ip|nfcache|<target_offset>target_offset|<next_offset>next_offset|comefrom|<ipt_counters>counters|<elems0>(elems[0])}"];
+	subgraph cluster_match {
+	label="ipt_match";
+	ipt_match [lable="{<head>ipt_match}"];
+	user [label="{<head>user|match_size|name|revision}"];
+	match_size;
+	"data[0]"; 
+	}
+	
+	ipt_udp [label="{<head>ipt_udp|spts|dpts|invflags}"];
+   
+   }
+
+	ipt_entry:elems0 -> ipt_match:head;
+	"data[0]" -> ipt_udp:head;
+}

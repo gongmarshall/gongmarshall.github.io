@@ -1,0 +1,146 @@
+digraph st2{
+    fontname = "Verdana";
+    fontsize = 10;
+    rankdir=TB;
+    compound = true //鍏佽瀛愬浘闂村瓨鍦ㄨ竟
+     
+    node [fontname = "Verdana", fontsize = 10, color="skyblue", shape="record"];
+     
+    edge [fontname = "Verdana", fontsize = 10, color="crimson", style="solid"];
+     
+   
+/*鐢ㄦ埛灞傜殑NAT*/  
+   subgraph cluster_nat {
+	label="NAT";
+	bgcolor="yellow"
+	subgraph cluster_prerouting {
+	label="PREROUTING";
+	lan_dnat [label="{<head>lan_dnat|upnp_rule}"];
+	net_dnat [lable="{<head>net_dnat|openvpn_tun_rule|upnp_rule|openvpn_rule}"];
+	}
+
+	subgraph cluster_postrouting {
+	label="POSTROUTING";
+	br0_masq;
+	brwan_masq;
+	}
+	   
+   
+}
+
+setoptsock [lable="{<head>setoptsock|ipt_replace}"];
+do_ipt_set_ctl [lable="{<head>do_ipt_set_ctl}"];
+
+do_replace->translate_table [label="translate usr talbe to kernel table"];
+translate_table->__do_replace;
+
+
+  subgraph cluster_translate_table {
+	style = dotted;
+	bgcolor="mintcream"
+	label="translate_table";
+	translate_table;
+	translate_table->find_check_entry;
+	find_check_entry->find_check_match->xt_request_find_match->xt_find_match->"xt[af].match";
+	find_check_entry->xt_request_find_target->xt_find_target->"xt[af].target"
+	"xt[af].target"->newinfo
+	"xt[af].match"->newinfo
+	
+	
+}
+
+setoptsock->do_ipt_set_ctl->do_replace;
+net_dnat->setoptsock [lhead = setoptsock ltail = cluster_nat]
+
+__do_replace -> "net->xt.tables[NFPROTO_IPV4]"->nf_nat_ipv4_table
+
+nf_nat_ipv4_table [label="{<head>nf_nat_ipv4_table|<name>(nat)|<valid_hoooks>(PRE_ROUTING/POST_ROUTING/LOCAL_OUT/LOCAL_IN)|<af>NFPROTO_IPV4|<xt_table_info>(*private)|name}"];
+
+
+
+ subgraph cluster_nf_nat_ipv4 {
+	label="nf_nat_ipv4_ops";
+	bgcolor="lightyellow"
+	
+	nat_pre [label="{<hook>.hook=nf_nat_ipv4_in|.pf=NFPROTO_IPV4|.hooknum=NF_INET_PRE_ROUTING|.priority=NF_IP_PRI_NAT_DST}"];
+	nat_post [label="{<hook>.hook=nf_nat_ipv4_out|.pf=NFPROTO_IPV4|.hooknum=NF_INET_POST_ROUTING|.priority=NF_IP_PRI_NAT_SRC}"];
+	nat_out [label="{<hook>.hook=nf_nat_ipv4_local_fn|.pf=NFPROTO_IPV4|.hooknum=NF_INET_LOCAL_OUT|.priority=NF_IP_PRI_NAT_DST}"];
+	nat_in [label="{<hook>.hook=nf_nat_ipv4_fn|.pf=NFPROTO_IPV4|.hooknum=NF_INET_LOCAL_IN|.priority=NF_IP_PRI_NAT_SRC}"];
+
+
+	}
+	   
+  subgraph cluster_nf_hooks {
+	label="nf_hooks[ipv4]";
+	bgcolor="lightyellow"
+	
+	hooks_pre [label="{<head>NF_INET_PRE_ROUTING}"];
+	hooks_post [label="{<head>NF_INET_POST_ROUTING}"];
+	hooks_out [label="{<head>NF_INET_LOCAL_OUT}"];
+	hooks_in [label="{<head>NF_INET_LOCAL_IN}"];
+	hooks_forward [label="{<head>NF_INET_FORWARD}"]
+
+
+	} 
+
+hooks_pre:head->nat_pre [color=green];
+hooks_post:head->nat_post;
+hooks_out:head->nat_out;
+hooks_in:head->nat_in;
+nat_pre:hook ->ipt_do_table [color=green]
+ipt_do_table->nf_nat_ipv4_table:xt_table_info [color=green];
+nf_nat_ipv4_table:xt_table_info->newinfo [color=green];
+nat_post:hook -> ipt_do_table [style=dashed];
+
+nat_in:hook -> ipt_do_table [style=dashed];
+nat_out:hook -> ipt_do_table [style=dashed];
+
+subgraph cluster_5hooks {
+	style = dotted;
+
+L3 [shape=box, width = 5, height =0.5 ];
+L2 [shape=box, width = 5, height = 0.5];
+{
+	rank =same;
+	"route in" [shape=square,color = forestgreen, style=filled, fontsize=15];
+	"route out" [shape= square,color= forestgreen, style=filled, fontsize=15];
+}
+{
+	rank =same;
+	"prerouting" [shape=circle,color = pink, style=filled, fontsize=15];
+	"postrouting" [shape=circle, color = pink, style=filled, fontsize=15];
+	
+}
+"forward" [shape=circle, color = pink, style=filled, fontsize=15];
+" " [shape=point];
+{
+	rank =same;
+	"local_in" [shape=circle, color = pink, style=filled, fontsize=15];
+	"local_out" [shape=circle, color = pink, style=filled, fontsize=15];
+		
+}
+
+	"route in" ->"forward"->" ";
+	L3->"local_out"->"route out"->" "->"postrouting"->L2;
+	L2->"prerouting"->"route in"->"local_in"->L3;
+}
+"prerouting"->NF_HOOK [style=dashed,color=green ,fontcolor=green, headlabel ="call nf_hooks[NFPROTO_IPV4][NF_INET_PRE_ROUTING] list->hook"];
+"postrouting"->NF_HOOK [style=dashed, color=blue];
+"forward"->NF_HOOK [style=dashed, color=blue];
+"local_in"->NF_HOOK [style=dashed, color=blue];
+"local_out"->NF_HOOK [style=dashed, color=blue];
+NF_HOOK->hooks_pre [color=green];
+NF_HOOK->hooks_post [style=dashed, color=blue];
+NF_HOOK->hooks_in [style=dashed, color=blue];
+NF_HOOK->hooks_out [style=dashed, color=blue];
+NF_HOOK->hooks_forward [style=dashed, color=blue];
+subgraph cluster_mt_tgt {
+	label="there may be a lots of matches and targets registered in xt[af] list..."
+	style = dotted;
+	bgcolor="yellow"
+	tcp [label="{<head>.name=tcp|.family=NFPROTO_IPV4|<match>.match=tcp_mt|<checkentry>.checkentry=tcp_mt_check|.proto=IPPROTO_TCP}"];
+	xt_register_matches-> tcp -> "xt[af].match" [color=black];
+	dnat [label="{<head>.name=dnat|<target>.target=xt_dnat_target_v1|.table=nat|hooks=NF_XX_PRE_ROUTING/NF_XX_LOCAL_OUT}"];
+	xt_register_targets->dnat->"xt[af].target" [color=black];
+}
+}
